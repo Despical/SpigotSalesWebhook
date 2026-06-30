@@ -157,7 +157,7 @@ Delete the configured state file if you want the worker to rebuild its baseline 
 
 We prioritize user privacy and application integrity. Please do not open public issues for discovered vulnerabilities.
 
-Read our [SECURITY.md](../SECURITY.md) for responsible disclosure reporting.
+Read our [SECURITY.md](SECURITY.md) for responsible disclosure reporting.
 
 ---
 
@@ -170,7 +170,7 @@ We welcome Pull Requests from the community. To help us maintain clean project h
 * **Version control cleanliness:** Do not increment project version numbers in example configurations within your PR.
 * **Minimal diffs:** Disable automated reformat-on-save settings that affect untouched files.
 
-Learn more via our formal [Contribution Guidelines](../CONTRIBUTING.md).
+Learn more via our formal [Contribution Guidelines](CONTRIBUTING.md).
 
 ---
 
@@ -178,4 +178,4 @@ Learn more via our formal [Contribution Guidelines](../CONTRIBUTING.md).
 
 This project is licensed under the [GPL-3.0 License](http://www.gnu.org/licenses/gpl-3.0.html).
 
-See the [LICENSE](../LICENSE) file for comprehensive copyright notices and third-party attributions.
+See the [LICENSE](LICENSE) file for comprehensive copyright notices and third-party attributions.
