@@ -6,7 +6,7 @@
 
 SpigotSalesWebhook is a lightweight Java worker that watches SpigotMC premium resource buyer lists and sends Discord webhook notifications when new buyers appear.
 
-It is designed for a simple VDS-style setup: configure your Spigot cookie, Discord webhook URL, and resource buyer-list URLs once, then leave the worker running. The first scan records the current buyers without sending old purchases; later scans only notify for new buyers.
+It is designed for straightforward self-hosting: configure your Spigot cookie, Discord webhook URL, and resource buyer-list URLs once, then leave the worker running wherever you prefer. The first scan records the current buyers without sending old purchases; later scans only notify for new buyers.
 
 ---
 
@@ -15,7 +15,6 @@ It is designed for a simple VDS-style setup: configure your Spigot cookie, Disco
 * **Hourly buyer scans:** Polls configured Spigot resource buyer pages on a configurable interval.
 * **Discord embeds:** Sends clean webhook embeds with buyer, plugin, price, currency, and purchase time.
 * **First-run baseline:** Records existing buyers on the first run without spamming Discord.
-* **Plugin-based state:** Tracks seen buyers per plugin in `data/seen-sales.json`.
 * **Single config file:** Uses `src/main/resources/config.yml`; no `.env` file is required.
 * **Self-hostable:** Runs as a standalone Java process or Docker container.
 
