@@ -128,7 +128,7 @@ docker compose logs -f spigot-sales-webhook
 docker compose down
 ```
 
-The compose file mounts `src/main/resources/config.yml` into `/opt/spigot-sales-webhook/config.yml` as read-only and mounts `./data` into `/opt/spigot-sales-webhook/data`, so seen buyer state survives rebuilds and restarts.
+The compose file mounts `src/main/resources/config.yml` into `/opt/spigot-sales-webhook/config.yml` as read-only and mounts `./data` into `/opt/spigot-sales-webhook/data`, so seen buyer state survives rebuilds and restarts. The container prepares the mounted data directory automatically before starting the worker.
 
 The Docker image does not copy your real `src/main/resources/config.yml` into the image. Keep private webhook and cookie values only in your local config file.
 
