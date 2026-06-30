@@ -47,6 +47,14 @@ public class SaleMonitor {
     private final SaleStateStore stateStore;
 
     public void runOnce() {
+        try {
+            runScan();
+        } catch (Exception exception) {
+            LOGGER.error("Spigot sales scan failed unexpectedly.", exception);
+        }
+    }
+
+    private void runScan() {
         LOGGER.info("Starting Spigot sales scan...");
 
         SaleState state = stateStore.load();
@@ -73,6 +81,8 @@ public class SaleMonitor {
         }
 
         try {
+            LOGGER.info("Sending {} new sales to Discord.", newSales.size());
+
             webhookClient.send(newSales);
             stateStore.save(state.markInitialized(updatedKeys));
 
