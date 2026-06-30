@@ -30,8 +30,10 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,6 +45,7 @@ import java.util.regex.Pattern;
 public class SpigotScraper {
 
     private static final Pattern PRICE_PATTERN = Pattern.compile("(\\d+(?:[.,]\\d+)?)");
+    private static final int MAX_PAGES_PER_PLUGIN = 200;
 
     private final String cookie;
     private final long requestDelayMs;
@@ -54,10 +57,11 @@ public class SpigotScraper {
 
     public List<SpigotSale> scrape(PluginTarget plugin) throws IOException {
         List<SpigotSale> sales = new ArrayList<>();
+        Set<String> seenBuyerKeys = new LinkedHashSet<>();
         int page = 1;
 
-        while (true) {
-            String url = page == 1 ? plugin.buyerListUrl() : plugin.buyerListUrl() + "?page=" + page;
+        while (page <= MAX_PAGES_PER_PLUGIN) {
+            String url = page == 1 ? plugin.buyerListUrl() : pagedUrl(plugin.buyerListUrl(), page);
             Document document = Jsoup.connect(url)
                 .header("Cookie", cookie)
                 .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/122.0.0.0 Safari/537.36")
@@ -70,12 +74,18 @@ public class SpigotScraper {
                 break;
             }
 
+            boolean foundNewBuyerOnPage = false;
             for (Element item : items) {
                 SpigotSale sale = parseSale(plugin, item);
 
-                if (sale != null) {
+                if (sale != null && seenBuyerKeys.add(sale.buyerKey())) {
                     sales.add(sale);
+                    foundNewBuyerOnPage = true;
                 }
+            }
+
+            if (!foundNewBuyerOnPage) {
+                break;
             }
 
             page++;
@@ -83,6 +93,10 @@ public class SpigotScraper {
         }
 
         return sales;
+    }
+
+    private String pagedUrl(String buyerListUrl, int page) {
+        return buyerListUrl + (buyerListUrl.contains("?") ? "&" : "?") + "page=" + page;
     }
 
     private SpigotSale parseSale(PluginTarget plugin, Element item) {

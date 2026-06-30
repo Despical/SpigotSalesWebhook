@@ -89,7 +89,10 @@ public class SaleMonitor {
             try {
                 LOGGER.info("Fetching buyers for {}.", plugin.name());
 
-                sales.addAll(scraper.scrape(plugin));
+                List<SpigotSale> pluginSales = scraper.scrape(plugin);
+                sales.addAll(pluginSales);
+
+                LOGGER.info("Fetched {} buyers for {}.", pluginSales.size(), plugin.name());
             } catch (Exception exception) {
                 LOGGER.error("Failed to fetch buyers for {}.", plugin.name(), exception);
             }
