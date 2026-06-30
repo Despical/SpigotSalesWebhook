@@ -3,6 +3,9 @@ services:
     build: .
     container_name: spigot-sales-webhook
     restart: unless-stopped
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     volumes:
       - ./src/main/resources/config.yml:/opt/spigot-sales-webhook/config.yml:ro
       - ./data:/opt/spigot-sales-webhook/data

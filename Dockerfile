@@ -12,6 +12,8 @@ FROM eclipse-temurin:25-jre-noble
 
 WORKDIR /opt/spigot-sales-webhook
 
+ENV JAVA_TOOL_OPTIONS="-Djava.net.preferIPv4Stack=true"
+
 RUN useradd --create-home --home-dir /opt/spigot-sales-webhook --shell /usr/sbin/nologin spigotsales
 
 COPY --from=build /workspace/build/install/SpigotSalesWebhook/ /opt/spigot-sales-webhook/
