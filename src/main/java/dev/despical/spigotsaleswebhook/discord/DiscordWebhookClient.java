@@ -57,13 +57,13 @@ public class DiscordWebhookClient {
     public void send(List<SpigotSale> sales) throws IOException, InterruptedException {
         for (int start = 0; start < sales.size(); start += MAX_EMBEDS_PER_MESSAGE) {
             int end = Math.min(start + MAX_EMBEDS_PER_MESSAGE, sales.size());
-            sendChunk(sales.subList(start, end), sales.size());
+            sendChunk(sales.subList(start, end));
 
             Thread.sleep(350);
         }
     }
 
-    private void sendChunk(List<SpigotSale> sales, int totalCount) throws IOException, InterruptedException {
+    private void sendChunk(List<SpigotSale> sales) throws IOException, InterruptedException {
         List<Map<String, Object>> embeds = new ArrayList<>();
 
         for (SpigotSale sale : sales) {
@@ -72,7 +72,6 @@ public class DiscordWebhookClient {
 
         Map<String, Object> payload = new LinkedHashMap<>() {{
             put("username", username);
-            put("content", "New Spigot sale%s% detected.".replace("%s%", totalCount == 1 ? "" : "s"));
             put("embeds", embeds);
             put("allowed_mentions", Map.of("parse", List.of()));
         }};
