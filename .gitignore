@@ -1,0 +1,8 @@
+.gradle/
+build/
+out/
+data/*.json
+src/main/resources/config.yml
+*.log
+*.pid
+.idea/

@@ -1,0 +1,8 @@
+services:
+  spigot-sales-webhook:
+    build: .
+    container_name: spigot-sales-webhook
+    restart: unless-stopped
+    volumes:
+      - ./src/main/resources/config.yml:/opt/spigot-sales-webhook/config.yml:ro
+      - ./data:/opt/spigot-sales-webhook/data

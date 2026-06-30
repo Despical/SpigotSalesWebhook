@@ -1,0 +1,50 @@
+name: Feature Request
+description: "Suggest an improvement for SpigotSalesWebhook."
+title: "[FEATURE] "
+labels: ["enhancement"]
+assignees:
+  - Despical
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement. Please describe the operational use case clearly.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What problem would this solve?
+      placeholder: I want to monitor multiple Discord channels depending on plugin...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What behavior or configuration would you like?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any other approach you considered?
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add examples, sanitized config, or logs if useful.
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to help implement or test this feature.
+          required: false

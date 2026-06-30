@@ -1,0 +1,87 @@
+name: Bug Report
+description: "Report a SpigotSalesWebhook bug or unexpected behavior."
+title: "[BUG] "
+labels: ["bug"]
+assignees:
+  - Despical
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please remove secrets from logs and config snippets before posting.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the issue clearly.
+      placeholder: The worker did not send a webhook after a new buyer appeared...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce this?
+      placeholder: |
+        1. Configure src/main/resources/config.yml with ...
+        2. Run java -jar build/libs/spigot-sales-webhook-1.0.0.jar --once
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: Which version, commit, or branch are you running?
+      placeholder: e.g. 1.0.0 or commit SHA
+    validations:
+      required: true
+
+  - type: input
+    id: java
+    attributes:
+      label: Java version
+      description: Output of java -version.
+      placeholder: e.g. Java 25
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      multiple: true
+      options:
+        - Windows
+        - Linux
+        - macOS
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Sanitized config
+      description: Paste relevant config.yml sections with webhook URLs and cookies removed.
+      render: yaml
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Paste relevant logs. Remove webhook URLs, cookies, and private tokens.
+      render: log
+
+  - type: checkboxes
+    id: validation
+    attributes:
+      label: Validation
+      options:
+        - label: I removed Discord webhook URLs, Spigot cookies, and other secrets from this issue.
+          required: true
+        - label: I checked for existing issues before submitting this.
+          required: true

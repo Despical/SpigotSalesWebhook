@@ -1,0 +1,15 @@
+<configuration>
+    <property name="CONSOLE_LOG_PATTERN" value="[%d{dd-MM-yyyy'T'HH:mm:ss}] [%5p] ${PID:- } --- [%15.15t] %-24.24logger{1} : %m%n%ex"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

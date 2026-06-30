@@ -1,0 +1,15 @@
+discord:
+  webhook-url: "https://discord.com/api/webhooks/your-webhook-id/your-webhook-token"
+  username: "Spigot Sales"
+
+spigot:
+  cookie: "xf_session=...; xf_user=...; xf_tfa_trust=..."
+  request-delay-ms: 800
+  plugins:
+    - name: "Plugin Name"
+      buyer-list-url: "https://www.spigotmc.org/resources/resource-name.resource-id/buyers"
+
+scan:
+  interval-minutes: 60
+  notify-existing-on-first-run: false
+  state-file: "data/seen-sales.json"

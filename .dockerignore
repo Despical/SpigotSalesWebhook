@@ -1,0 +1,16 @@
+.git
+.gradle
+.idea
+build
+data
+out
+target
+bin
+node_modules
+src/main/resources/config.yml
+*.log
+*.tmp
+*.temp
+*.pid
+Thumbs.db
+desktop.ini
