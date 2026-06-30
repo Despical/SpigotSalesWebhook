@@ -43,7 +43,7 @@ public class SpigotSalesWebhookApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpigotSalesWebhookApplication.class);
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         Path workingDirectory = Path.of("").toAbsolutePath();
         AppConfig config = new ConfigLoader().load(workingDirectory);
         ObjectMapper objectMapper = new ObjectMapper();
