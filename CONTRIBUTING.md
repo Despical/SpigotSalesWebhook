@@ -48,6 +48,7 @@ When submitting an issue:
 * Never paste your Discord webhook URL, Spigot cookie, or full private `config.yml`.
 * Keep support questions separate from actionable bugs when possible.
 
-## Security
+## Additional Resources
 
-Do not report vulnerabilities or leaked secrets in public issues. Use the process described in [SECURITY.md](SECURITY.md).
+* [General GitHub documentation](https://help.github.com/)
+* [GitHub pull request documentation](https://help.github.com/articles/creating-a-pull-request/)
