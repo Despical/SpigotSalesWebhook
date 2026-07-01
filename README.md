@@ -90,25 +90,25 @@ Linux / macOS:
 Run continuously:
 
 ```bash
-java -jar build/libs/spigot-sales-webhook-1.0.1.jar
+java -jar build/libs/spigot-sales-webhook-1.0.2.jar
 ```
 
 Run one scan and exit:
 
 ```bash
-java -jar build/libs/spigot-sales-webhook-1.0.1.jar --once
+java -jar build/libs/spigot-sales-webhook-1.0.2.jar --once
 ```
 
 Run one scan and notify existing buyers too:
 
 ```bash
-java -jar build/libs/spigot-sales-webhook-1.0.1.jar --once --notify-existing
+java -jar build/libs/spigot-sales-webhook-1.0.2.jar --once --notify-existing
 ```
 
 Send a test webhook:
 
 ```bash
-java -jar build/libs/spigot-sales-webhook-1.0.1.jar --test-webhook
+java -jar build/libs/spigot-sales-webhook-1.0.2.jar --test-webhook
 ```
 
 Docker:
