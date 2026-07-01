@@ -3,6 +3,7 @@
 [![](https://github.com/Despical/SpigotSalesWebhook/actions/workflows/build.yaml/badge.svg)](https://github.com/Despical/SpigotSalesWebhook/actions/workflows/build.yaml)
 [![](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![Java 25](https://img.shields.io/badge/Java-25-007396.svg)](https://www.java.com/)
+![Gradle](https://img.shields.io/badge/Gradle-9.6.1-079ec0?logo=gradle&logoColor=white)
 [![Docs](https://img.shields.io/badge/Docs-despical.dev-2ea44f.svg)](https://docs.despical.dev/spigot-webhook/)
 
 SpigotSalesWebhook is a lightweight Java worker that watches SpigotMC premium resource buyer lists and sends Discord webhook notifications when new buyers appear.
