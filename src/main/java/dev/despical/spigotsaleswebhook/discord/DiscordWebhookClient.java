@@ -28,6 +28,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -39,8 +40,9 @@ import java.util.*;
 public class DiscordWebhookClient {
 
     private static final int MAX_EMBEDS_PER_MESSAGE = 10;
+    private static final int EMBED_COLOR = 0x57F287;
     private static final ZoneId DISPLAY_ZONE = ZoneId.systemDefault();
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("h:mm a", Locale.US);
+    private static final DateTimeFormatter FOOTER_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
@@ -63,6 +65,18 @@ public class DiscordWebhookClient {
 
             Thread.sleep(350);
         }
+    }
+
+    public void sendTest() throws IOException, InterruptedException {
+        send(List.of(new SpigotSale(
+            "Example Plugin",
+            "https://www.spigotmc.org/",
+            "Despical",
+            "https://github.com/Despical",
+            ZonedDateTime.now(DISPLAY_ZONE),
+            0.0,
+            "FREE"
+        )));
     }
 
     private void sendChunk(List<SpigotSale> sales) throws IOException, InterruptedException {
@@ -96,13 +110,24 @@ public class DiscordWebhookClient {
 
     private Map<String, Object> createEmbed(SpigotSale sale) {
         return new LinkedHashMap<>() {{
-            put("color", 0x57F287);
+            put("color", EMBED_COLOR);
             put("description", formatSaleMessage(sale));
+            put("footer", Map.of("text", "SpigotMC \u2022 " + formatPurchaseDate(sale)));
         }};
     }
 
     private String formatSaleMessage(SpigotSale sale) {
-        return "`" + escapeInlineCode(sale.username()) + "` has purchased [`" + escapeInlineCode(sale.pluginName()) + "`](" + sale.pluginUrl() + ") for `" + formatPrice(sale) + "`. (" + formatPurchaseTime(sale) + ")";
+        return formatBuyer(sale) + " has purchased [`" + escapeInlineCode(sale.pluginName()) + "`](" + sale.pluginUrl() + ") for `" + formatPrice(sale) + "`.";
+    }
+
+    private String formatBuyer(SpigotSale sale) {
+        String username = "`" + escapeInlineCode(sale.username()) + "`";
+
+        if (sale.userProfileUrl() == null || sale.userProfileUrl().isBlank()) {
+            return username;
+        }
+
+        return "[" + username + "](" + sale.userProfileUrl() + ")";
     }
 
     private String formatPrice(SpigotSale sale) {
@@ -113,11 +138,14 @@ public class DiscordWebhookClient {
         return String.format(Locale.US, "%.2f %s", sale.price(), sale.currency());
     }
 
-    private String formatPurchaseTime(SpigotSale sale) {
-        return sale.purchaseDate().withZoneSameInstant(DISPLAY_ZONE).format(TIME_FORMATTER);
+    private String formatPurchaseDate(SpigotSale sale) {
+        return sale.purchaseDate().withZoneSameInstant(DISPLAY_ZONE).format(FOOTER_DATE_FORMATTER);
     }
 
     private String escapeInlineCode(String value) {
         return value.replace("`", "'");
     }
 }
+
+
+

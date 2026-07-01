@@ -116,10 +116,15 @@ public class SpigotScraper {
             plugin.name(),
             plugin.buyerListUrl(),
             username,
+            userProfileUrl(userElement),
             purchaseDate,
             price.amount(),
             price.currency()
         );
+    }
+
+    private String userProfileUrl(Element userElement) {
+        return userElement.absUrl("href");
     }
 
     private String extractDateText(Element item, String rawText) {

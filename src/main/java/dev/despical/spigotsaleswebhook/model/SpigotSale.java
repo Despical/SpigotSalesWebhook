@@ -30,6 +30,7 @@ public record SpigotSale(
     String pluginName,
     String pluginUrl,
     String username,
+    String userProfileUrl,
     ZonedDateTime purchaseDate,
     double price,
     String currency
