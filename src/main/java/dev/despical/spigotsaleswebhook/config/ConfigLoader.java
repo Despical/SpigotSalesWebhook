@@ -48,7 +48,8 @@ public class ConfigLoader {
     private DiscordSettings bindDiscord(YamlConfig config) {
         String webhookUrl = config.getString("discord.webhook-url");
         String username = config.getString("discord.username");
-        return new DiscordSettings(webhookUrl, username);
+        String avatarUrl = config.getString("discord.avatar-url");
+        return new DiscordSettings(webhookUrl, username, avatarUrl);
     }
 
     private SpigotSettings bindSpigot(YamlConfig config) {

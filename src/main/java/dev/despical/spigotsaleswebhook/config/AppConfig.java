@@ -37,7 +37,8 @@ public record AppConfig(
 
     public record DiscordSettings(
         String webhookUrl,
-        String username
+        String username,
+        String avatarUrl
     ) {
     }
 

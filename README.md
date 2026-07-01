@@ -52,6 +52,7 @@ Example:
 discord:
   webhook-url: "https://discord.com/api/webhooks/..."
   username: "Spigot Sales"
+  avatar-url: ""
 
 spigot:
   cookie: "xf_session=...; xf_user=...; xf_tfa_trust=..."

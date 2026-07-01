@@ -40,18 +40,20 @@ public class DiscordWebhookClient {
 
     private static final int MAX_EMBEDS_PER_MESSAGE = 10;
     private static final ZoneId DISPLAY_ZONE = ZoneId.systemDefault();
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm z");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("h:mm a", Locale.US);
 
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
     private final URI webhookUri;
     private final String username;
+    private final String avatarUrl;
 
     public DiscordWebhookClient(ObjectMapper objectMapper, AppConfig.DiscordSettings config) {
         this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = objectMapper;
         this.webhookUri = URI.create(config.webhookUrl());
         this.username = config.username();
+        this.avatarUrl = config.avatarUrl();
     }
 
     public void send(List<SpigotSale> sales) throws IOException, InterruptedException {
@@ -72,6 +74,10 @@ public class DiscordWebhookClient {
 
         Map<String, Object> payload = new LinkedHashMap<>() {{
             put("username", username);
+            if (avatarUrl != null && !avatarUrl.isBlank()) {
+                put("avatar_url", avatarUrl);
+            }
+
             put("embeds", embeds);
             put("allowed_mentions", Map.of("parse", List.of()));
         }};
@@ -90,27 +96,13 @@ public class DiscordWebhookClient {
 
     private Map<String, Object> createEmbed(SpigotSale sale) {
         return new LinkedHashMap<>() {{
-            put("title", "New Spigot sale");
-            put("url", sale.pluginUrl());
             put("color", 0x57F287);
-            put("description", "**" + escapeMarkdown(sale.username()) + "** purchased **" + escapeMarkdown(sale.pluginName()) + "**");
-            put("fields", List.of(
-                field("Buyer", sale.username(), true),
-                field("Plugin", sale.pluginName(), true),
-                field("Price", formatPrice(sale), true),
-                field("Purchased At", sale.purchaseDate().withZoneSameInstant(DISPLAY_ZONE).format(DATE_FORMATTER), false)
-            ));
-
-            put("footer", Map.of("text", "Spigot Purchase Webhook by Despical."));
+            put("description", formatSaleMessage(sale));
         }};
     }
 
-    private Map<String, Object> field(String name, String value, boolean inline) {
-        return new LinkedHashMap<>() {{
-            put("name", name);
-            put("value", truncate(value));
-            put("inline", inline);
-        }};
+    private String formatSaleMessage(SpigotSale sale) {
+        return "`" + escapeInlineCode(sale.username()) + "` has purchased [`" + escapeInlineCode(sale.pluginName()) + "`](" + sale.pluginUrl() + ") for `" + formatPrice(sale) + "`. (" + formatPurchaseTime(sale) + ")";
     }
 
     private String formatPrice(SpigotSale sale) {
@@ -121,17 +113,11 @@ public class DiscordWebhookClient {
         return String.format(Locale.US, "%.2f %s", sale.price(), sale.currency());
     }
 
-    private String truncate(String value) {
-        final int limit = 1024;
-
-        if (value.length() <= limit) {
-            return value;
-        }
-
-        return value.substring(0, limit - 3) + "...";
+    private String formatPurchaseTime(SpigotSale sale) {
+        return sale.purchaseDate().withZoneSameInstant(DISPLAY_ZONE).format(TIME_FORMATTER);
     }
 
-    private String escapeMarkdown(String value) {
-        return value.replace("*", "\\*").replace("_", "\\_").replace("`", "\\`");
+    private String escapeInlineCode(String value) {
+        return value.replace("`", "'");
     }
 }
