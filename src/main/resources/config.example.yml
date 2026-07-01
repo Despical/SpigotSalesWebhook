@@ -1,7 +1,7 @@
 discord:
   webhook-url: "https://discord.com/api/webhooks/your-webhook-id/your-webhook-token"
-  username: "Spigot Sales"
-  avatar-url: ""
+  username: "Spigot Sales Notifier"
+  avatar-url: "https://i.imgur.com/nigdPoy.png"
 
 spigot:
   cookie: "xf_session=...; xf_user=...; xf_tfa_trust=..."
