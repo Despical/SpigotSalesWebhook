@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -47,15 +48,29 @@ public class SpigotSalesWebhookApplication {
         Path workingDirectory = Path.of("").toAbsolutePath();
         AppConfig config = new ConfigLoader().load(workingDirectory);
         ObjectMapper objectMapper = new ObjectMapper();
+        DiscordWebhookClient webhookClient = new DiscordWebhookClient(objectMapper, config.discord());
+
+        List<String> argList = Arrays.asList(args);
+        if (argList.contains("--test-webhook")) {
+            try {
+                webhookClient.sendTest();
+
+                LOGGER.info("Discord test webhook sent.");
+            } catch (Exception exception) {
+                LOGGER.error("Could not send Discord test webhook.", exception);
+            }
+
+            return;
+        }
 
         SaleMonitor monitor = new SaleMonitor(
             config,
             new SpigotScraper(config.spigot()),
-            new DiscordWebhookClient(objectMapper, config.discord()),
+            webhookClient,
             new SaleStateStore(objectMapper, config.scan().stateFile())
         );
 
-        if (Arrays.asList(args).contains("--once")) {
+        if (argList.contains("--once")) {
             monitor.runOnce();
             return;
         }

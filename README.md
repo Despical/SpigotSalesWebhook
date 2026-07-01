@@ -105,6 +105,18 @@ Run one scan and notify existing buyers too:
 java -jar build/libs/spigot-sales-webhook-1.0.1.jar --once --notify-existing
 ```
 
+Send a test webhook:
+
+```bash
+java -jar build/libs/spigot-sales-webhook-1.0.1.jar --test-webhook
+```
+
+Docker:
+
+```bash
+docker compose run --rm spigot-sales-webhook --test-webhook
+```
+
 ---
 
 ## Docker
