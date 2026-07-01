@@ -1,8 +1,31 @@
+# Build outputs
 .gradle/
 build/
 out/
-data/*.json
-src/main/resources/config.yml
+target/
+bin/
+
+# Logs and temporary files
 *.log
+*.tmp
+*.temp
 *.pid
-.idea/
+
+# Runtime storage
+/data/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IntelliJ IDEA
+.idea/*
+!.idea/
+!.idea/icon.svg
+*.iml
+
+# VS Code
+.vscode/
+
+src/main/resources/config.yml
