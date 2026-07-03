@@ -2,6 +2,7 @@ services:
   spigot-sales-webhook:
     build: .
     image: spigot-sales-webhook:local
+    container_name: spigotsaleswebhook
     restart: unless-stopped
     dns:
       - 1.1.1.1
