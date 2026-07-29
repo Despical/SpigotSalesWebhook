@@ -22,6 +22,7 @@ import dev.despical.spigotsaleswebhook.config.AppConfig;
 import dev.despical.spigotsaleswebhook.discord.DiscordWebhookClient;
 import dev.despical.spigotsaleswebhook.model.PluginTarget;
 import dev.despical.spigotsaleswebhook.model.SpigotSale;
+import dev.despical.spigotsaleswebhook.spigot.SpigotAuthenticationException;
 import dev.despical.spigotsaleswebhook.spigot.SpigotScraper;
 import dev.despical.spigotsaleswebhook.state.SaleState;
 import dev.despical.spigotsaleswebhook.state.SaleStateStore;
@@ -45,6 +46,7 @@ public class SaleMonitor {
     private final SpigotScraper scraper;
     private final DiscordWebhookClient webhookClient;
     private final SaleStateStore stateStore;
+    private boolean authenticationFailureNotified;
 
     public void runOnce() {
         try {
@@ -59,7 +61,15 @@ public class SaleMonitor {
 
         SaleState state = stateStore.load();
 
-        List<SpigotSale> scrapedSales = scrapeAllPlugins();
+        ScrapeResult scrapeResult = scrapeAllPlugins();
+        if (scrapeResult.authenticationFailed()) {
+            notifyAuthenticationFailure();
+            return;
+        }
+
+        authenticationFailureNotified = false;
+
+        List<SpigotSale> scrapedSales = scrapeResult.sales();
         List<SpigotSale> newSales = scrapedSales.stream()
             .filter(sale -> !sale.wasSeen(state.seenSalesFor(sale.pluginName())))
             .sorted(Comparator.comparing(SpigotSale::purchaseDate))
@@ -92,7 +102,7 @@ public class SaleMonitor {
         }
     }
 
-    private List<SpigotSale> scrapeAllPlugins() {
+    private ScrapeResult scrapeAllPlugins() {
         List<SpigotSale> sales = new ArrayList<>();
 
         for (PluginTarget plugin : config.spigot().plugins()) {
@@ -103,12 +113,30 @@ public class SaleMonitor {
                 sales.addAll(pluginSales);
 
                 LOGGER.info("Fetched {} buyers for {}.", pluginSales.size(), plugin.name());
+            } catch (SpigotAuthenticationException exception) {
+                LOGGER.error("Spigot authentication failed while fetching buyers for {}.", plugin.name(), exception);
+                return new ScrapeResult(sales, true);
             } catch (Exception exception) {
                 LOGGER.error("Failed to fetch buyers for {}.", plugin.name(), exception);
             }
         }
 
-        return sales;
+        return new ScrapeResult(sales, false);
+    }
+
+    private void notifyAuthenticationFailure() {
+        if (authenticationFailureNotified) {
+            return;
+        }
+
+        try {
+            webhookClient.sendAuthenticationWarning();
+            authenticationFailureNotified = true;
+
+            LOGGER.warn("Sent Spigot authentication warning to Discord.");
+        } catch (Exception exception) {
+            LOGGER.error("Could not send Spigot authentication warning to Discord.", exception);
+        }
     }
 
     private Map<String, Set<String>> mergeSeenSales(SaleState state, List<SpigotSale> scrapedSales) {
@@ -126,5 +154,8 @@ public class SaleMonitor {
 
     private long countKeys(Map<String, Set<String>> keysByPlugin) {
         return keysByPlugin.values().stream().mapToLong(Set::size).sum();
+    }
+
+    private record ScrapeResult(List<SpigotSale> sales, boolean authenticationFailed) {
     }
 }

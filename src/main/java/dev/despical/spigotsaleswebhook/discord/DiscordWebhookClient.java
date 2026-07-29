@@ -41,6 +41,7 @@ public class DiscordWebhookClient {
 
     private static final int MAX_EMBEDS_PER_MESSAGE = 10;
     private static final int EMBED_COLOR = 0x57F287;
+    private static final int WARNING_EMBED_COLOR = 0xED4245;
     private static final ZoneId DISPLAY_ZONE = ZoneId.systemDefault();
     private static final DateTimeFormatter FOOTER_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
@@ -80,6 +81,18 @@ public class DiscordWebhookClient {
         )));
     }
 
+    public void sendAuthenticationWarning() throws IOException, InterruptedException {
+        Map<String, Object> embed = new LinkedHashMap<>();
+        embed.put("color", WARNING_EMBED_COLOR);
+        embed.put("title", "Spigot authentication warning");
+        embed.put(
+            "description",
+            "Spigot authentication tokens might be expired. Check the application logs and update `spigot.cookie` in `config.yml`."
+        );
+
+        sendEmbeds(List.of(embed));
+    }
+
     private void sendChunk(List<SpigotSale> sales) throws IOException, InterruptedException {
         List<Map<String, Object>> embeds = new ArrayList<>();
 
@@ -87,6 +100,10 @@ public class DiscordWebhookClient {
             embeds.add(createEmbed(sale));
         }
 
+        sendEmbeds(embeds);
+    }
+
+    private void sendEmbeds(List<Map<String, Object>> embeds) throws IOException, InterruptedException {
         Map<String, Object> payload = new LinkedHashMap<>() {{
             put("username", username);
             if (avatarUrl != null && !avatarUrl.isBlank()) {
