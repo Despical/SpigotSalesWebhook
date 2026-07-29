@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Despical
  * <p>
- * Created at 30.06.2026
+ * Created at 29.07.2026
  */
 class SpigotScraperTest {
 

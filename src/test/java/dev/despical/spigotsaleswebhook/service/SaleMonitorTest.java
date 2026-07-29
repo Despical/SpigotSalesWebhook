@@ -38,6 +38,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+/**
+ * @author Despical
+ * <p>
+ * Created at 29.07.2026
+ */
 class SaleMonitorTest {
 
     @TempDir
