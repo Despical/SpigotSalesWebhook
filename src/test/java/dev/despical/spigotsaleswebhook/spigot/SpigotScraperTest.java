@@ -26,7 +26,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Despical
@@ -57,5 +59,35 @@ class SpigotScraperTest {
             """).selectFirst("li");
 
         assertNull(scraper.previousUsername(item));
+    }
+
+    @Test
+    void detectsSpigotLoginPage() {
+        var document = Jsoup.parse(
+            "<form action=\"/login/login\"><input name=\"login\"></form>",
+            "https://www.spigotmc.org/resources/example.123/buyers"
+        );
+
+        assertTrue(scraper.isAuthenticationPage(document));
+    }
+
+    @Test
+    void detectsSpigotPermissionPage() {
+        var document = Jsoup.parse(
+            "<main>You do not have permission to view this page or perform this action.</main>",
+            "https://www.spigotmc.org/resources/example.123/buyers"
+        );
+
+        assertTrue(scraper.isAuthenticationPage(document));
+    }
+
+    @Test
+    void acceptsAuthenticatedBuyerPage() {
+        var document = Jsoup.parse(
+            "<li class=\"primaryContent memberListItem\"><a class=\"username\">Despical</a></li>",
+            "https://www.spigotmc.org/resources/example.123/buyers"
+        );
+
+        assertFalse(scraper.isAuthenticationPage(document));
     }
 }

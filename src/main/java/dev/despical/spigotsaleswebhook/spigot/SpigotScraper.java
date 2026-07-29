@@ -22,6 +22,7 @@ import dev.despical.spigotsaleswebhook.config.AppConfig;
 import dev.despical.spigotsaleswebhook.model.PluginTarget;
 import dev.despical.spigotsaleswebhook.model.SpigotSale;
 import dev.despical.spigotsaleswebhook.util.DateParser;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -66,12 +67,11 @@ public class SpigotScraper {
 
         while (page <= MAX_PAGES_PER_PLUGIN) {
             String url = page == 1 ? plugin.buyerListUrl() : pagedUrl(plugin.buyerListUrl(), page);
-            Document document = Jsoup.connect(url)
-                .header("Cookie", cookie)
-                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/122.0.0.0 Safari/537.36")
-                .referrer("https://www.spigotmc.org/")
-                .timeout(15000)
-                .get();
+            Document document = fetchDocument(url);
+
+            if (isAuthenticationPage(document)) {
+                throw new SpigotAuthenticationException("Spigot returned a login or permission page for " + url);
+            }
 
             Elements items = document.select("li.primaryContent.memberListItem");
             if (items.isEmpty()) {
@@ -97,6 +97,40 @@ public class SpigotScraper {
         }
 
         return sales;
+    }
+
+    private Document fetchDocument(String url) throws IOException {
+        try {
+            return Jsoup.connect(url)
+                .header("Cookie", cookie)
+                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/122.0.0.0 Safari/537.36")
+                .referrer("https://www.spigotmc.org/")
+                .timeout(15000)
+                .get();
+        } catch (HttpStatusException exception) {
+            if (exception.getStatusCode() == 401 || exception.getStatusCode() == 403) {
+                throw new SpigotAuthenticationException(
+                    "Spigot rejected the buyer request with HTTP " + exception.getStatusCode(),
+                    exception
+                );
+            }
+
+            throw exception;
+        }
+    }
+
+    boolean isAuthenticationPage(Document document) {
+        String location = document.location().toLowerCase(Locale.ROOT);
+        if (location.contains("/login")) {
+            return true;
+        }
+
+        if (document.selectFirst("form[action*=\"login/login\"], input[name=\"login\"]") != null) {
+            return true;
+        }
+
+        Element body = document.body();
+        return body != null && body.text().contains("You do not have permission to view this page or perform this action.");
     }
 
     private String pagedUrl(String buyerListUrl, int page) {
