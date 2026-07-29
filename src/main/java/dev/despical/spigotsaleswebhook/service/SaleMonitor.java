@@ -61,7 +61,7 @@ public class SaleMonitor {
 
         List<SpigotSale> scrapedSales = scrapeAllPlugins();
         List<SpigotSale> newSales = scrapedSales.stream()
-            .filter(sale -> !state.seenSalesFor(sale.pluginName()).contains(sale.buyerKey()))
+            .filter(sale -> !sale.wasSeen(state.seenSalesFor(sale.pluginName())))
             .sorted(Comparator.comparing(SpigotSale::purchaseDate))
             .toList();
 
@@ -116,7 +116,9 @@ public class SaleMonitor {
         state.seenSalesByPlugin().forEach((pluginName, keys) -> updatedKeys.put(pluginName, new LinkedHashSet<>(keys)));
 
         for (SpigotSale sale : scrapedSales) {
-            updatedKeys.computeIfAbsent(sale.pluginName(), _ -> new LinkedHashSet<>()).add(sale.buyerKey());
+            Set<String> pluginKeys = updatedKeys.computeIfAbsent(sale.pluginName(), _ -> new LinkedHashSet<>());
+            pluginKeys.removeAll(sale.legacyBuyerKeys());
+            pluginKeys.add(sale.buyerKey());
         }
 
         return updatedKeys;

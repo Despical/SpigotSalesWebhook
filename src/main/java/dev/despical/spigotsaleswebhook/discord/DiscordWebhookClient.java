@@ -72,6 +72,7 @@ public class DiscordWebhookClient {
             "Example Plugin",
             "https://www.spigotmc.org/",
             "Despical",
+            null,
             "https://github.com/Despical",
             ZonedDateTime.now(DISPLAY_ZONE),
             0.0,

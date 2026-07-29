@@ -45,6 +45,10 @@ import java.util.regex.Pattern;
 public class SpigotScraper {
 
     private static final Pattern PRICE_PATTERN = Pattern.compile("(\\d+(?:[.,]\\d+)?)");
+    private static final Pattern PREVIOUS_USERNAME_PATTERN = Pattern.compile(
+        "\\bPreviously\\s+(.+?)(?:,|$)",
+        Pattern.CASE_INSENSITIVE
+    );
     private static final int MAX_PAGES_PER_PLUGIN = 200;
 
     private final String cookie;
@@ -116,11 +120,19 @@ public class SpigotScraper {
             plugin.name(),
             plugin.buyerListUrl(),
             username,
+            previousUsername(item),
             userProfileUrl(userElement),
             purchaseDate,
             price.amount(),
             price.currency()
         );
+    }
+
+    String previousUsername(Element item) {
+        Element userBlurb = item.selectFirst(".userBlurb");
+        String text = userBlurb == null ? item.text() : userBlurb.text();
+        Matcher matcher = PREVIOUS_USERNAME_PATTERN.matcher(text);
+        return matcher.find() ? matcher.group(1).trim() : null;
     }
 
     private String userProfileUrl(Element userElement) {

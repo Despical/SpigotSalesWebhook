@@ -19,7 +19,11 @@
 package dev.despical.spigotsaleswebhook.model;
 
 import java.time.ZonedDateTime;
+import java.util.LinkedHashSet;
 import java.util.Locale;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Despical
@@ -30,13 +34,52 @@ public record SpigotSale(
     String pluginName,
     String pluginUrl,
     String username,
+    String previousUsername,
     String userProfileUrl,
     ZonedDateTime purchaseDate,
     double price,
     String currency
 ) {
 
+    private static final Pattern MEMBER_ID_PATTERN = Pattern.compile(
+        "/members/(?:[^/?#]*\\.)?(\\d+)(?:/|$)",
+        Pattern.CASE_INSENSITIVE
+    );
+
     public String buyerKey() {
-        return username.trim().toLowerCase(Locale.ROOT);
+        if (userProfileUrl != null) {
+            Matcher matcher = MEMBER_ID_PATTERN.matcher(userProfileUrl);
+
+            if (matcher.find()) {
+                return "spigot-user:" + matcher.group(1);
+            }
+        }
+
+        return normalizedUsername(username);
+    }
+
+    public Set<String> legacyBuyerKeys() {
+        Set<String> keys = new LinkedHashSet<>();
+        addUsernameKey(keys, username);
+        addUsernameKey(keys, previousUsername);
+        return keys;
+    }
+
+    public boolean wasSeen(Set<String> seenBuyerKeys) {
+        if (seenBuyerKeys.contains(buyerKey())) {
+            return true;
+        }
+
+        return legacyBuyerKeys().stream().anyMatch(seenBuyerKeys::contains);
+    }
+
+    private static void addUsernameKey(Set<String> keys, String value) {
+        if (value != null && !value.isBlank()) {
+            keys.add(normalizedUsername(value));
+        }
+    }
+
+    private static String normalizedUsername(String value) {
+        return value.trim().toLowerCase(Locale.ROOT);
     }
 }
