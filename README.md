@@ -17,6 +17,7 @@ It is designed for straightforward self-hosting: configure your Spigot cookie, D
 * **Hourly buyer scans:** Polls configured Spigot resource buyer pages on a configurable interval.
 * **Discord embeds:** Sends clean webhook embeds with buyer, plugin, price, currency, and purchase time.
 * **First-run baseline:** Records existing buyers on the first run without spamming Discord.
+* **Free-purchase filtering:** Optionally skips Discord notifications for free purchases.
 * **Single config file:** Uses `src/main/resources/config.yml`; no `.env` file is required.
 * **Self-hostable:** Runs as a standalone Java process or Docker container.
 
@@ -64,8 +65,11 @@ spigot:
 scan:
   interval-minutes: 60
   notify-existing-on-first-run: false
+  notify-free-purchases: false
   state-file: "data/seen-sales.json"
 ```
+
+Set `scan.notify-free-purchases` to `true` if you want Discord notifications for purchases whose price is `0.00`. It defaults to `false`; free buyers are still recorded in the state file, so they are not repeatedly reconsidered on later scans.
 
 ---
 
@@ -90,25 +94,25 @@ Linux / macOS:
 Run continuously:
 
 ```bash
-java -jar build/libs/spigot-sales-webhook-1.0.3.jar
+java -jar build/libs/spigot-sales-webhook-1.0.4.jar
 ```
 
 Run one scan and exit:
 
 ```bash
-java -jar build/libs/spigot-sales-webhook-1.0.3.jar --once
+java -jar build/libs/spigot-sales-webhook-1.0.4.jar --once
 ```
 
 Run one scan and notify existing buyers too:
 
 ```bash
-java -jar build/libs/spigot-sales-webhook-1.0.3.jar --once --notify-existing
+java -jar build/libs/spigot-sales-webhook-1.0.4.jar --once --notify-existing
 ```
 
 Send a test webhook:
 
 ```bash
-java -jar build/libs/spigot-sales-webhook-1.0.3.jar --test-webhook
+java -jar build/libs/spigot-sales-webhook-1.0.4.jar --test-webhook
 ```
 
 Docker:
