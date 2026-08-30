@@ -25,6 +25,7 @@ import dev.despical.spigotsaleswebhook.model.PluginTarget;
 import dev.despical.spigotsaleswebhook.model.SpigotSale;
 import dev.despical.spigotsaleswebhook.spigot.SpigotAuthenticationException;
 import dev.despical.spigotsaleswebhook.spigot.SpigotScraper;
+import dev.despical.spigotsaleswebhook.state.SaleState;
 import dev.despical.spigotsaleswebhook.state.SaleStateStore;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -33,10 +34,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Despical
@@ -58,7 +62,7 @@ class SaleMonitorTest {
         AppConfig config = new AppConfig(
             new AppConfig.DiscordSettings("https://example.com/webhook", "Spigot Sales", ""),
             new AppConfig.SpigotSettings("", 0, List.of(plugin)),
-            new AppConfig.ScanSettings(Duration.ofMinutes(1), false, stateFile)
+            new AppConfig.ScanSettings(Duration.ofMinutes(1), false, false, stateFile)
         );
         AuthenticationFailingScraper scraper = new AuthenticationFailingScraper(config.spigot());
         RecordingWebhookClient webhookClient = new RecordingWebhookClient(config.discord());
@@ -84,6 +88,41 @@ class SaleMonitorTest {
         assertEquals(2, webhookClient.authenticationWarningCount);
     }
 
+    @Test
+    void recordsFreePurchasesWithoutSendingDiscordNotificationsWhenDisabled() {
+        Path stateFile = tempDirectory.resolve("seen-sales.json");
+        PluginTarget plugin = new PluginTarget(
+            "Advanced Parkour",
+            "https://www.spigotmc.org/resources/advanced-parkour.123/buyers"
+        );
+        AppConfig config = new AppConfig(
+            new AppConfig.DiscordSettings("https://example.com/webhook", "Spigot Sales", ""),
+            new AppConfig.SpigotSettings("", 0, List.of(plugin)),
+            new AppConfig.ScanSettings(Duration.ofMinutes(1), true, false, stateFile)
+        );
+        SpigotSale freeSale = new SpigotSale(
+            plugin.name(),
+            plugin.buyerListUrl(),
+            "FreeBuyer",
+            null,
+            "https://www.spigotmc.org/members/freebuyer.123/",
+            ZonedDateTime.now(ZoneOffset.UTC),
+            0,
+            "USD"
+        );
+        StaticScraper scraper = new StaticScraper(config.spigot(), freeSale);
+        RecordingWebhookClient webhookClient = new RecordingWebhookClient(config.discord());
+        SaleStateStore stateStore = new SaleStateStore(new ObjectMapper(), stateFile);
+        SaleMonitor monitor = new SaleMonitor(config, scraper, webhookClient, stateStore);
+
+        monitor.runOnce();
+
+        assertTrue(webhookClient.sentSales.isEmpty());
+        SaleState state = stateStore.load();
+        assertTrue(state.initialized());
+        assertTrue(state.seenSalesFor(plugin.name()).contains(freeSale.buyerKey()));
+    }
+
     private static class AuthenticationFailingScraper extends SpigotScraper {
 
         private boolean authenticationFails = true;
@@ -105,6 +144,7 @@ class SaleMonitorTest {
     private static class RecordingWebhookClient extends DiscordWebhookClient {
 
         private int authenticationWarningCount;
+        private List<SpigotSale> sentSales = List.of();
 
         private RecordingWebhookClient(AppConfig.DiscordSettings config) {
             super(new ObjectMapper(), config);
@@ -113,6 +153,26 @@ class SaleMonitorTest {
         @Override
         public void sendAuthenticationWarning() {
             authenticationWarningCount++;
+        }
+
+        @Override
+        public void send(List<SpigotSale> sales) {
+            sentSales = sales;
+        }
+    }
+
+    private static class StaticScraper extends SpigotScraper {
+
+        private final List<SpigotSale> sales;
+
+        private StaticScraper(AppConfig.SpigotSettings config, SpigotSale... sales) {
+            super(config);
+            this.sales = List.of(sales);
+        }
+
+        @Override
+        public List<SpigotSale> scrape(PluginTarget plugin) {
+            return sales;
         }
     }
 }

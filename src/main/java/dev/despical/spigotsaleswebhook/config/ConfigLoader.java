@@ -74,9 +74,10 @@ public class ConfigLoader {
     private ScanSettings bindScan(YamlConfig config, Path workingDirectory) {
         long intervalMinutes = config.getLong("scan.interval-minutes");
         boolean notifyExistingOnFirstRun = config.getBoolean("scan.notify-existing-on-first-run");
+        boolean notifyFreePurchases = config.getBoolean("scan.notify-free-purchases");
 
         Path stateFile = workingDirectory.resolve(config.getString("scan.state-file")).normalize();
-        return new ScanSettings(Duration.ofMinutes(intervalMinutes), notifyExistingOnFirstRun, stateFile);
+        return new ScanSettings(Duration.ofMinutes(intervalMinutes), notifyExistingOnFirstRun, notifyFreePurchases, stateFile);
     }
 
     private static String stringValue(Map<String, Object> map, String key) {

@@ -72,6 +72,7 @@ public class SaleMonitor {
         List<SpigotSale> scrapedSales = scrapeResult.sales();
         List<SpigotSale> newSales = scrapedSales.stream()
             .filter(sale -> !sale.wasSeen(state.seenSalesFor(sale.pluginName())))
+            .filter(sale -> config.scan().notifyFreePurchases() || sale.price() > 0)
             .sorted(Comparator.comparing(SpigotSale::purchaseDate))
             .toList();
 

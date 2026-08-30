@@ -52,6 +52,7 @@ public record AppConfig(
     public record ScanSettings(
         Duration interval,
         boolean notifyExistingOnFirstRun,
+        boolean notifyFreePurchases,
         Path stateFile
     ) {
     }

@@ -13,4 +13,5 @@ spigot:
 scan:
   interval-minutes: 60
   notify-existing-on-first-run: false
+  notify-free-purchases: false
   state-file: "data/seen-sales.json"
